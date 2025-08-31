@@ -108,6 +108,7 @@ const handleSubmit = () => {
       email: formData.value.email.trim(),
       password: formData.value.password,
       passwordMasked: '•'.repeat(formData.value.password.length),
+      createdAt: new Date().toLocaleString(),
     }
     users.value.push(user)
     localStorage.setItem('users', JSON.stringify(users.value))
@@ -127,11 +128,13 @@ const clearForm = () => {
 
 const removeUser = (id) => {
   users.value = users.value.filter((u) => u.id !== id)
+  localStorage.setItem('users', JSON.stringify(users.value))
 }
 
 const clearAll = () => {
   if (confirm('Clear all saved users?')) {
     users.value = []
+    localStorage.setItem('users', JSON.stringify(users.value))
   }
 }
 </script>
@@ -227,6 +230,7 @@ const clearAll = () => {
           <Column field="name" header="Name" />
           <Column field="email" header="Email" />
           <Column field="password" header="Password" />
+          <Column field="createdAt" header="Created At" />
           <Column header="Actions">
             <template #body="{ data }">
               <button class="btn btn-sm btn-outline-danger" @click="removeUser(data.id)">
