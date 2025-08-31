@@ -1,6 +1,8 @@
 <!-- src/components/RegisterForm.vue -->
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 // state
 const formData = ref({
@@ -100,9 +102,27 @@ const handleSubmit = () => {
     !errors.value.password &&
     !errors.value.confirmPassword
   ) {
-    console.log('Register form submitted:', { ...formData.value })
+    const user = {
+      id: crypto?.randomUUID?.() || String(Date.now()),
+      name: formData.value.name.trim(),
+      email: formData.value.email.trim(),
+      passwordMasked: '•'.repeat(formData.value.password.length),
+      createdAt: new Date().toISOString(),
+    }
+    users.value.push(user)
+    localStorage.setItem('users', JSON.stringify(users.value))
+    clearForm()
     alert('Submitted! (valid)')
   }
+}
+
+const users = ref([])
+onMounted(() => {
+  users.value = JSON.parse(localStorage.getItem('users') || '[]')
+})
+
+const clearForm = () => {
+  formData.value = { name: '', email: '', password: '', confirmPassword: '' }
 }
 </script>
 
@@ -124,8 +144,6 @@ const handleSubmit = () => {
                 @blur="() => validateName(true)"
                 @input="() => validateName(false)"
                 :class="{ invalid: !!errors.name }"
-                aria-describedby="nameHelp"
-                :aria-invalid="!!errors.name"
               />
               <small id="nameHelp" v-if="errors.name" class="error">{{ errors.name }}</small>
             </label>
@@ -140,8 +158,6 @@ const handleSubmit = () => {
                 @blur="() => validateEmail(true)"
                 @input="() => validateEmail(false)"
                 :class="{ invalid: !!errors.email }"
-                aria-describedby="emailHelp"
-                :aria-invalid="!!errors.email"
               />
               <small id="emailHelp" v-if="errors.email" class="error">{{ errors.email }}</small>
             </label>
@@ -166,8 +182,6 @@ const handleSubmit = () => {
                   }
                 "
                 :class="{ invalid: !!errors.password }"
-                aria-describedby="passwordHelp"
-                :aria-invalid="!!errors.password"
               />
               <small id="passwordHelp" v-if="errors.password" class="error">{{
                 errors.password
@@ -184,8 +198,6 @@ const handleSubmit = () => {
                 @blur="() => validateConfirm(true)"
                 @input="() => validateConfirm(false)"
                 :class="{ invalid: !!errors.confirmPassword }"
-                aria-describedby="confirmHelp"
-                :aria-invalid="!!errors.confirmPassword"
               />
               <small id="confirmHelp" v-if="errors.confirmPassword" class="error">{{
                 errors.confirmPassword
@@ -195,6 +207,18 @@ const handleSubmit = () => {
             <button type="submit" class="btn" :disabled="isDisabled">Create Account</button>
           </form>
         </div>
+      </div>
+    </div>
+    <!-- PrimeVue DataTable -->
+    <div class="row mt-5" v-if="users.length">
+      <div class="col-12">
+        <h4>Registered Users</h4>
+        <DataTable :value="users" tableStyle="min-width: 40rem">
+          <Column field="name" header="Name" />
+          <Column field="email" header="Email" />
+          <Column field="passwordMasked" header="Password" />
+          <Column field="createdAt" header="Created At" />
+        </DataTable>
       </div>
     </div>
   </div>
