@@ -1,20 +1,108 @@
 <!-- src/components/RegisterForm.vue -->
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+// state
+const formData = ref({
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+})
 
-function handleSubmit() {
-  console.log('Register form submitted:', {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-    confirmPassword: confirmPassword.value,
-  })
-  alert('Submitted!')
+const errors = ref({
+  name: null,
+  email: null,
+  password: null,
+  confirmPassword: null,
+})
+
+// validators
+const validateName = (blur) => {
+  if (formData.value.name.trim().length < 3) {
+    if (blur) errors.value.name = 'Name must be at least 3 characters'
+  } else {
+    errors.value.name = null
+  }
+}
+
+const validateEmail = (blur) => {
+  const val = formData.value.email.trim()
+  if (!val) {
+    if (blur) errors.value.email = 'Email is required'
+  } else {
+    const re = /^\S+@\S+\.\S+$/
+    if (!re.test(val)) {
+      if (blur) errors.value.email = 'Invalid email format'
+    } else {
+      errors.value.email = null
+    }
+  }
+}
+
+const validatePassword = (blur) => {
+  const pwd = formData.value.password
+  const minLength = 8
+  const hasUpper = /[A-Z]/.test(pwd)
+  const hasLower = /[a-z]/.test(pwd)
+  const hasNum = /\d/.test(pwd)
+  const hasSpec = /[!@#$%^&*(),.?":{}|<>]/.test(pwd)
+
+  if (pwd.length < minLength) {
+    if (blur) errors.value.password = `Password must be at least ${minLength} characters long.`
+  } else if (!hasUpper) {
+    if (blur) errors.value.password = 'Password must contain at least one uppercase letter.'
+  } else if (!hasLower) {
+    if (blur) errors.value.password = 'Password must contain at least one lowercase letter.'
+  } else if (!hasNum) {
+    if (blur) errors.value.password = 'Password must contain at least one number.'
+  } else if (!hasSpec) {
+    if (blur) errors.value.password = 'Password must contain at least one special character.'
+  } else {
+    errors.value.password = null
+  }
+}
+
+const validateConfirm = (blur) => {
+  if (!formData.value.confirmPassword) {
+    if (blur) errors.value.confirmPassword = 'Please confirm your password'
+  } else if (formData.value.confirmPassword !== formData.value.password) {
+    if (blur) errors.value.confirmPassword = 'Passwords do not match'
+  } else {
+    errors.value.confirmPassword = null
+  }
+}
+
+// submit
+const isDisabled = computed(() => {
+  const f = formData.value
+  return (
+    !f.name ||
+    !f.email ||
+    !f.password ||
+    !f.confirmPassword ||
+    errors.value.name ||
+    errors.value.email ||
+    errors.value.password ||
+    errors.value.confirmPassword
+  )
+})
+
+const handleSubmit = () => {
+  validateName(true)
+  validateEmail(true)
+  validatePassword(true)
+  validateConfirm(true)
+
+  if (
+    !errors.value.name &&
+    !errors.value.email &&
+    !errors.value.password &&
+    !errors.value.confirmPassword
+  ) {
+    console.log('Register form submitted:', { ...formData.value })
+    alert('Submitted! (valid)')
+  }
 }
 </script>
 
@@ -23,27 +111,83 @@ function handleSubmit() {
     <h1>Register</h1>
 
     <form @submit.prevent="handleSubmit" class="form">
+      <!-- Name -->
       <label class="label">
         <span>Name</span>
-        <input v-model="name" type="text" placeholder="Your full name" />
+        <input
+          v-model="formData.name"
+          type="text"
+          placeholder="Your full name"
+          @blur="() => validateName(true)"
+          @input="() => validateName(false)"
+          :class="{ invalid: !!errors.name }"
+          aria-describedby="nameHelp"
+          :aria-invalid="!!errors.name"
+        />
+        <small id="nameHelp" v-if="errors.name" class="error">{{ errors.name }}</small>
       </label>
 
+      <!-- Email -->
       <label class="label">
         <span>Email</span>
-        <input v-model="email" type="email" placeholder="name@example.com" />
+        <input
+          v-model="formData.email"
+          type="email"
+          placeholder="name@example.com"
+          @blur="() => validateEmail(true)"
+          @input="() => validateEmail(false)"
+          :class="{ invalid: !!errors.email }"
+          aria-describedby="emailHelp"
+          :aria-invalid="!!errors.email"
+        />
+        <small id="emailHelp" v-if="errors.email" class="error">{{ errors.email }}</small>
       </label>
 
+      <!-- Password -->
       <label class="label">
         <span>Password</span>
-        <input v-model="password" type="password" placeholder="At least 8 characters" />
+        <input
+          v-model="formData.password"
+          type="password"
+          placeholder="At least 8 characters"
+          @blur="
+            () => {
+              validatePassword(true)
+              validateConfirm(true)
+            }
+          "
+          @input="
+            () => {
+              validatePassword(false)
+              validateConfirm(false)
+            }
+          "
+          :class="{ invalid: !!errors.password }"
+          aria-describedby="passwordHelp"
+          :aria-invalid="!!errors.password"
+        />
+        <small id="passwordHelp" v-if="errors.password" class="error">{{ errors.password }}</small>
       </label>
 
+      <!-- Confirm -->
       <label class="label">
         <span>Confirm Password</span>
-        <input v-model="confirmPassword" type="password" placeholder="Re-enter password" />
+        <input
+          v-model="formData.confirmPassword"
+          type="password"
+          placeholder="Re-enter password"
+          @blur="() => validateConfirm(true)"
+          @input="() => validateConfirm(false)"
+          :class="{ invalid: !!errors.confirmPassword }"
+          aria-describedby="confirmHelp"
+          :aria-invalid="!!errors.confirmPassword"
+        />
+        <small id="confirmHelp" v-if="errors.confirmPassword" class="error">{{
+          errors.confirmPassword
+        }}</small>
       </label>
 
-      <button type="submit" class="btn">Create Account</button>
+      <button type="submit" class="btn" :disabled="isDisabled">Create Account</button>
     </form>
   </div>
 </template>
