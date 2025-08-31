@@ -106,8 +106,8 @@ const handleSubmit = () => {
       id: crypto?.randomUUID?.() || String(Date.now()),
       name: formData.value.name.trim(),
       email: formData.value.email.trim(),
+      password: formData.value.password,
       passwordMasked: '•'.repeat(formData.value.password.length),
-      createdAt: new Date().toISOString(),
     }
     users.value.push(user)
     localStorage.setItem('users', JSON.stringify(users.value))
@@ -123,6 +123,16 @@ onMounted(() => {
 
 const clearForm = () => {
   formData.value = { name: '', email: '', password: '', confirmPassword: '' }
+}
+
+const removeUser = (id) => {
+  users.value = users.value.filter((u) => u.id !== id)
+}
+
+const clearAll = () => {
+  if (confirm('Clear all saved users?')) {
+    users.value = []
+  }
 }
 </script>
 
@@ -216,9 +226,18 @@ const clearForm = () => {
         <DataTable :value="users" tableStyle="min-width: 40rem">
           <Column field="name" header="Name" />
           <Column field="email" header="Email" />
-          <Column field="passwordMasked" header="Password" />
-          <Column field="createdAt" header="Created At" />
+          <Column field="password" header="Password" />
+          <Column header="Actions">
+            <template #body="{ data }">
+              <button class="btn btn-sm btn-outline-danger" @click="removeUser(data.id)">
+                Delete
+              </button>
+            </template>
+          </Column>
         </DataTable>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <button class="btn btn-secondary" @click="clearAll" v-if="users.length">Clear All</button>
       </div>
     </div>
   </div>
