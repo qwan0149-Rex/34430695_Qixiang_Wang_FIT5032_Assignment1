@@ -107,88 +107,96 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="register-card">
-    <h1>Register</h1>
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="register-card">
+          <h1>Register</h1>
 
-    <form @submit.prevent="handleSubmit" class="form">
-      <!-- Name -->
-      <label class="label">
-        <span>Name</span>
-        <input
-          v-model="formData.name"
-          type="text"
-          placeholder="Your full name"
-          @blur="() => validateName(true)"
-          @input="() => validateName(false)"
-          :class="{ invalid: !!errors.name }"
-          aria-describedby="nameHelp"
-          :aria-invalid="!!errors.name"
-        />
-        <small id="nameHelp" v-if="errors.name" class="error">{{ errors.name }}</small>
-      </label>
+          <form @submit.prevent="handleSubmit" class="form" novalidate>
+            <!-- Name -->
+            <label class="label">
+              <span>Name</span>
+              <input
+                v-model="formData.name"
+                type="text"
+                placeholder="Your full name"
+                @blur="() => validateName(true)"
+                @input="() => validateName(false)"
+                :class="{ invalid: !!errors.name }"
+                aria-describedby="nameHelp"
+                :aria-invalid="!!errors.name"
+              />
+              <small id="nameHelp" v-if="errors.name" class="error">{{ errors.name }}</small>
+            </label>
 
-      <!-- Email -->
-      <label class="label">
-        <span>Email</span>
-        <input
-          v-model="formData.email"
-          type="email"
-          placeholder="name@example.com"
-          @blur="() => validateEmail(true)"
-          @input="() => validateEmail(false)"
-          :class="{ invalid: !!errors.email }"
-          aria-describedby="emailHelp"
-          :aria-invalid="!!errors.email"
-        />
-        <small id="emailHelp" v-if="errors.email" class="error">{{ errors.email }}</small>
-      </label>
+            <!-- Email -->
+            <label class="label">
+              <span>Email</span>
+              <input
+                v-model="formData.email"
+                type="email"
+                placeholder="name@example.com"
+                @blur="() => validateEmail(true)"
+                @input="() => validateEmail(false)"
+                :class="{ invalid: !!errors.email }"
+                aria-describedby="emailHelp"
+                :aria-invalid="!!errors.email"
+              />
+              <small id="emailHelp" v-if="errors.email" class="error">{{ errors.email }}</small>
+            </label>
 
-      <!-- Password -->
-      <label class="label">
-        <span>Password</span>
-        <input
-          v-model="formData.password"
-          type="password"
-          placeholder="At least 8 characters"
-          @blur="
-            () => {
-              validatePassword(true)
-              validateConfirm(true)
-            }
-          "
-          @input="
-            () => {
-              validatePassword(false)
-              validateConfirm(false)
-            }
-          "
-          :class="{ invalid: !!errors.password }"
-          aria-describedby="passwordHelp"
-          :aria-invalid="!!errors.password"
-        />
-        <small id="passwordHelp" v-if="errors.password" class="error">{{ errors.password }}</small>
-      </label>
+            <!-- Password -->
+            <label class="label">
+              <span>Password</span>
+              <input
+                v-model="formData.password"
+                type="password"
+                placeholder="At least 8 characters"
+                @blur="
+                  () => {
+                    validatePassword(true)
+                    validateConfirm(true)
+                  }
+                "
+                @input="
+                  () => {
+                    validatePassword(false)
+                    validateConfirm(false)
+                  }
+                "
+                :class="{ invalid: !!errors.password }"
+                aria-describedby="passwordHelp"
+                :aria-invalid="!!errors.password"
+              />
+              <small id="passwordHelp" v-if="errors.password" class="error">{{
+                errors.password
+              }}</small>
+            </label>
 
-      <!-- Confirm -->
-      <label class="label">
-        <span>Confirm Password</span>
-        <input
-          v-model="formData.confirmPassword"
-          type="password"
-          placeholder="Re-enter password"
-          @blur="() => validateConfirm(true)"
-          @input="() => validateConfirm(false)"
-          :class="{ invalid: !!errors.confirmPassword }"
-          aria-describedby="confirmHelp"
-          :aria-invalid="!!errors.confirmPassword"
-        />
-        <small id="confirmHelp" v-if="errors.confirmPassword" class="error">{{
-          errors.confirmPassword
-        }}</small>
-      </label>
+            <!-- Confirm -->
+            <label class="label">
+              <span>Confirm Password</span>
+              <input
+                v-model="formData.confirmPassword"
+                type="password"
+                placeholder="Re-enter password"
+                @blur="() => validateConfirm(true)"
+                @input="() => validateConfirm(false)"
+                :class="{ invalid: !!errors.confirmPassword }"
+                aria-describedby="confirmHelp"
+                :aria-invalid="!!errors.confirmPassword"
+              />
+              <small id="confirmHelp" v-if="errors.confirmPassword" class="error">{{
+                errors.confirmPassword
+              }}</small>
+            </label>
 
-      <button type="submit" class="btn" :disabled="isDisabled">Create Account</button>
-    </form>
+            <button type="submit" class="btn" :disabled="isDisabled">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
