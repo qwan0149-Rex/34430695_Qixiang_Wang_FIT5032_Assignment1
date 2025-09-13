@@ -1,8 +1,10 @@
 <!-- src/components/RegisterForm.vue -->
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
+// import { ref, computed, onMounted } from 'vue'
+// import DataTable from 'primevue/datatable'
+// import Column from 'primevue/column'
+import { ref, computed } from 'vue'
+import { register as fbRegister } from '../auth.js'
 
 // state
 const formData = ref({
@@ -10,6 +12,7 @@ const formData = ref({
   email: '',
   password: '',
   confirmPassword: '',
+  role: 'user',
 })
 
 const errors = ref({
@@ -90,53 +93,53 @@ const isDisabled = computed(() => {
   )
 })
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   validateName(true)
   validateEmail(true)
   validatePassword(true)
   validateConfirm(true)
-
   if (
-    !errors.value.name &&
-    !errors.value.email &&
-    !errors.value.password &&
-    !errors.value.confirmPassword
-  ) {
-    const user = {
-      id: crypto?.randomUUID?.() || String(Date.now()),
+    errors.value.name ||
+    errors.value.email ||
+    errors.value.password ||
+    errors.value.confirmPassword
+  )
+    return
+
+  try {
+    await fbRegister({
       name: formData.value.name.trim(),
       email: formData.value.email.trim(),
       password: formData.value.password,
-      passwordMasked: '•'.repeat(formData.value.password.length),
-      createdAt: new Date().toLocaleString(),
-    }
-    users.value.push(user)
-    localStorage.setItem('users', JSON.stringify(users.value))
+      role: formData.value.role,
+    })
     clearForm()
-    alert('Submitted! (valid)')
+    alert('Account created via Firebase!')
+  } catch (e) {
+    alert(e?.message || 'Register failed')
   }
 }
 
-const users = ref([])
-onMounted(() => {
-  users.value = JSON.parse(localStorage.getItem('users') || '[]')
-})
+// const users = ref([])
+// onMounted(() => {
+//   users.value = JSON.parse(localStorage.getItem('users') || '[]')
+// })
 
 const clearForm = () => {
-  formData.value = { name: '', email: '', password: '', confirmPassword: '' }
+  formData.value = { name: '', email: '', password: '', confirmPassword: '', role: 'user' }
 }
 
-const removeUser = (id) => {
-  users.value = users.value.filter((u) => u.id !== id)
-  localStorage.setItem('users', JSON.stringify(users.value))
-}
+// const removeUser = (id) => {
+//   users.value = users.value.filter((u) => u.id !== id)
+//   localStorage.setItem('users', JSON.stringify(users.value))
+// }
 
-const clearAll = () => {
-  if (confirm('Clear all saved users?')) {
-    users.value = []
-    localStorage.setItem('users', JSON.stringify(users.value))
-  }
-}
+// const clearAll = () => {
+//   if (confirm('Clear all saved users?')) {
+//     users.value = []
+//     localStorage.setItem('users', JSON.stringify(users.value))
+//   }
+// }
 </script>
 
 <template>
@@ -222,7 +225,7 @@ const clearAll = () => {
         </div>
       </div>
     </div>
-    <!-- PrimeVue DataTable -->
+    <!-- PrimeVue DataTable
     <div class="row mt-5" v-if="users.length">
       <div class="col-12">
         <h4>Registered Users</h4>
@@ -243,7 +246,7 @@ const clearAll = () => {
       <div class="d-flex justify-content-between align-items-center mb-2">
         <button class="btn btn-secondary" @click="clearAll" v-if="users.length">Clear All</button>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
