@@ -1,3 +1,15 @@
+<script setup>
+import { computed } from 'vue'
+import { authState } from '../auth.js'
+
+const displayName = computed(
+  () => authState.user?.displayName || authState.user?.email?.split('@')[0] || 'User',
+)
+</script>
+
 <template>
-  <div style="min-height: 50vh"></div>
+  <section class="container py-5">
+    <h1 class="h4">Dashboard</h1>
+    <p>Welcome! {{ displayName }}！</p>
+  </section>
 </template>

@@ -220,6 +220,15 @@ const clearForm = () => {
               }}</small>
             </label>
 
+            <!-- Role -->
+            <label class="label">
+              <span>Role</span>
+              <select v-model="formData.role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+
             <button type="submit" class="btn" :disabled="isDisabled">Create Account</button>
           </form>
         </div>
