@@ -5,6 +5,7 @@
 // import Column from 'primevue/column'
 import { ref, computed } from 'vue'
 import { register as fbRegister } from '../auth.js'
+import { useRouter } from 'vue-router'
 
 // state
 const formData = ref({
@@ -93,6 +94,8 @@ const isDisabled = computed(() => {
   )
 })
 
+const router = useRouter()
+
 const handleSubmit = async () => {
   validateName(true)
   validateEmail(true)
@@ -107,14 +110,16 @@ const handleSubmit = async () => {
     return
 
   try {
+    const chosenRole = formData.value.role
     await fbRegister({
       name: formData.value.name.trim(),
       email: formData.value.email.trim(),
       password: formData.value.password,
-      role: formData.value.role,
+      role: chosenRole,
     })
-    clearForm()
     alert('Account created via Firebase!')
+    router.replace(chosenRole === 'admin' ? '/admin' : '/dashboard')
+    clearForm()
   } catch (e) {
     alert(e?.message || 'Register failed')
   }

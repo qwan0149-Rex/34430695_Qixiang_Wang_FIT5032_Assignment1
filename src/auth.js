@@ -35,6 +35,8 @@ export async function register({ name, email, password, role = 'user' }) {
     role,
     createdAt: new Date().toISOString(),
   })
+  authState.user = cred.user
+  authState.role = role
   return cred.user
 }
 

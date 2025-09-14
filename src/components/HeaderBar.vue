@@ -1,11 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { authState, logout } from '../auth.js'
 
 const router = useRouter()
+const route = useRoute()
 const isAuthed = computed(() => !!authState.user)
 const isAdmin = computed(() => authState.role === 'admin')
+const showAdmin = computed(() => route.path.startsWith('/admin') || isAdmin.value)
 const displayName = computed(
   () => authState.user?.displayName || authState.user?.email?.split('@')[0] || 'User',
 )
@@ -26,7 +29,7 @@ const doLogout = async () => {
         <li class="nav-item" v-if="isAuthed">
           <RouterLink to="/dashboard" class="nav-link">Dashboard</RouterLink>
         </li>
-        <li class="nav-item" v-if="isAdmin">
+        <li class="nav-item" v-if="showAdmin">
           <RouterLink to="/admin" class="nav-link">Admin</RouterLink>
         </li>
         <li class="nav-item ms-auto" v-if="!isAuthed">

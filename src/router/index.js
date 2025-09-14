@@ -18,6 +18,11 @@ const routes = [
   { path: '/admin', component: AdminView, meta: { requiresAuth: true, role: 'admin' } },
 
   { path: '/:pathMatch(.*)*', redirect: '/' },
+  {
+    path: '/event',
+    component: () => import('../views/FoodEventView.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
