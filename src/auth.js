@@ -8,7 +8,7 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 
 export const authState = reactive({ user: null, role: null, ready: false })
 
@@ -16,8 +16,24 @@ export function initAuth() {
   onAuthStateChanged(auth, async (u) => {
     authState.user = u
     if (u) {
-      const snap = await getDoc(doc(db, 'users', u.uid))
-      authState.role = snap.exists() ? snap.data().role : 'user'
+      const ref = doc(db, 'users', u.uid)
+      const snap = await getDoc(ref)
+      if (!snap.exists()) {
+        await setDoc(
+          ref,
+          {
+            uid: u.uid,
+            name: u.displayName ?? '',
+            email: (u.email || '').toLowerCase(),
+            role: 'user',
+            createdAt: serverTimestamp(),
+          },
+          { merge: true },
+        )
+        authState.role = 'user'
+      } else {
+        authState.role = snap.data().role ?? 'user'
+      }
     } else {
       authState.role = null
     }
@@ -25,18 +41,23 @@ export function initAuth() {
   })
 }
 
-export async function register({ name, email, password, role = 'user' }) {
+export async function register({ name, email, password /*, role ignored */ }) {
   const cred = await createUserWithEmailAndPassword(auth, email, password)
   await updateProfile(cred.user, { displayName: name })
-  await setDoc(doc(db, 'users', cred.user.uid), {
-    uid: cred.user.uid,
-    name,
-    email: email.toLowerCase(),
-    role,
-    createdAt: new Date().toISOString(),
-  })
+  const ref = doc(db, 'users', cred.user.uid)
+  await setDoc(
+    ref,
+    {
+      uid: cred.user.uid,
+      name,
+      email: email.toLowerCase(),
+      role: 'user',
+      createdAt: serverTimestamp(),
+    },
+    { merge: true },
+  )
   authState.user = cred.user
-  authState.role = role
+  authState.role = 'user'
   return cred.user
 }
 

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { login } from '../auth.js'
 import { db } from '../firebase'
 import { doc, getDoc } from 'firebase/firestore'
@@ -10,6 +10,7 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 const router = useRouter()
+const route = useRoute()
 
 const submit = async () => {
   error.value = ''
@@ -18,7 +19,9 @@ const submit = async () => {
     const user = await login(email.value.trim(), password.value)
     const snap = await getDoc(doc(db, 'users', user.uid))
     const role = snap.exists() ? snap.data().role : 'user'
-    router.push(role === 'admin' ? '/admin' : '/dashboard')
+    const fallback = role === 'admin' ? '/admin' : '/dashboard'
+    const redirect = route.query.redirect
+    router.push(typeof redirect === 'string' ? redirect : fallback)
   } catch (e) {
     const code = e?.code || ''
     if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
