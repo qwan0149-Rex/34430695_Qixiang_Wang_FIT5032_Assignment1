@@ -23,6 +23,11 @@ const routes = [
     component: () => import('../views/FoodEventView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/email',
+    component: () => import('../views/EmailView.vue'),
+    meta: { requiresAuth: true, role: 'admin' },
+  },
 ]
 
 const router = createRouter({

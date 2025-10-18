@@ -11,5 +11,6 @@ const displayName = computed(
   <section class="container py-5">
     <h1 class="h4">Admin</h1>
     <p>Welcome! {{ displayName }}！</p>
+    <RouterLink to="/email" class="btn btn-primary mt-3">Open Email Center</RouterLink>
   </section>
 </template>
