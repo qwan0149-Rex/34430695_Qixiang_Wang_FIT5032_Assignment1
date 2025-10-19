@@ -69,7 +69,6 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta?.requiresAuth && !authState.user) {
-    alert('Please log in to use GenAI features.')
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 
