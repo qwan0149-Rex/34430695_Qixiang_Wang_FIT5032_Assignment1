@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import HomeActivity from './HomeActivity.vue'
+</script>
 
 <template>
   <section class="container py-5">
@@ -13,5 +15,7 @@
         <RouterLink to="/event" class="btn btn-primary">Go to Event</RouterLink>
       </div>
     </div>
+
+    <HomeActivity />
   </section>
 </template>

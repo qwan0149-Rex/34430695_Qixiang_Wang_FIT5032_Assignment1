@@ -6,6 +6,7 @@ import RegisterView from '../views/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import UserHub from '../views/UserHub.vue'
 import AdminView from '../views/AdminView.vue'
+import AiView from '../views/AiView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
@@ -27,6 +28,18 @@ const routes = [
     path: '/email',
     component: () => import('../views/EmailView.vue'),
     meta: { requiresAuth: true, role: 'admin' },
+  },
+  {
+    path: '/map',
+    component: () => import('../views/MapView.vue'),
+    meta: { requiresAuth: true },
+  },
+  { path: '/ai', name: 'ai', component: AiView, meta: { requiresAuth: true } },
+  {
+    path: '/charts',
+    name: 'charts',
+    component: () => import('@/views/ChartsView.vue'),
+    meta: { requiresAuth: true },
   },
 ]
 
@@ -56,6 +69,7 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta?.requiresAuth && !authState.user) {
+    alert('Please log in to use GenAI features.')
     return { path: '/login', query: { redirect: to.fullPath } }
   }
 

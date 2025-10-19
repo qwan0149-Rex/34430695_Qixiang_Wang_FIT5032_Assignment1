@@ -8,7 +8,7 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, updateDoc, increment } from 'firebase/firestore'
 
 export const authState = reactive({ user: null, role: null, ready: false })
 
@@ -56,6 +56,14 @@ export async function register({ name, email, password /*, role ignored */ }) {
     },
     { merge: true },
   )
+  try {
+    const statsRef = doc(db, 'stats', 'global')
+    await updateDoc(statsRef, {
+      usersTotal: increment(1),
+    })
+  } catch (e) {
+    console.warn('stats/global not initialized yet:', e?.message)
+  }
   authState.user = cred.user
   authState.role = 'user'
   return cred.user

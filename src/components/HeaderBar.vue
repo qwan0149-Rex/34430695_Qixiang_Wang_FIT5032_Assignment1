@@ -17,6 +17,14 @@ const doLogout = async () => {
   await logout()
   router.push('/')
 }
+
+function goAI() {
+  if (!authState.user) {
+    router.push({ path: '/login', query: { redirect: '/ai' } })
+  } else {
+    router.push('/ai')
+  }
+}
 </script>
 
 <template>
@@ -31,6 +39,15 @@ const doLogout = async () => {
         </li>
         <li class="nav-item" v-if="showAdmin">
           <RouterLink to="/admin" class="nav-link">Admin</RouterLink>
+        </li>
+        <li class="nav-item">
+          <RouterLink class="nav-link" to="/map">Map</RouterLink>
+        </li>
+        <li class="nav-item">
+          <a role="button" class="nav-link" @click.prevent="goAI">AI</a>
+        </li>
+        <li class="nav-item">
+          <RouterLink to="/charts" class="nav-link">Charts</RouterLink>
         </li>
         <li class="nav-item ms-auto" v-if="!isAuthed">
           <RouterLink to="/user" class="nav-link">User</RouterLink>
